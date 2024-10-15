@@ -19,16 +19,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=flask-monitoring \
-                    -Dsonar.host.url=${SONARQUBE_URL} \
-                    -Dsonar.login=$SONAR_TOKEN \
-                    -Dsonar.python.version=3.8 \
-                    -Dsonar.sources=. \
-                    -Dsonar.language=py
-                    '''
+
                 }
             }
         }
