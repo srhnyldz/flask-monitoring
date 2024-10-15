@@ -5,7 +5,7 @@ pipeline {
         cred = credentials('aws-key') // AWS access key için tanımlı credential
         dockerhub_cred = credentials('docker-cred') // Docker Hub için tanımlı credential
         DOCKER_IMAGE = "srhnyldz/flask-monitoring"
-        DOCKER_TAG = "flask-monitoring:latest"
+        DOCKER_TAG = "$BUILD_NUMBER"
         SONARQUBE_URL = 'http://localhost:9000/'
         SONAR_TOKEN = credentials('SONAR_TOKEN')
     }
@@ -17,22 +17,13 @@ pipeline {
                 git url: 'https://github.com/srhnyldz/flask-monitoring.git', branch: 'main'
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                echo 'Building the image'
-                sh 'docker build -t flask-monitoring .'
-            }
-        }
-        stage('Push to Docker Hub') {
-            steps {
-                echo 'Pushing to Docker Hub'
-                withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh '''
-                    echo "${PASS}" | docker login --username "${USER}" --password-stdin
-                    docker tag flask-monitoring ${USER}/flask-monitoring:latest
-                    docker push ${USER}/flask-monitoring:latest
-                    '''
+       stage("Docker Build & Push"){ // Docker image build ve push aşaması
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {                        
+                        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    }
                 }
             }
         }
