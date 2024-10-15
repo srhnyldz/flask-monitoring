@@ -17,12 +17,7 @@ pipeline {
                 git url: 'https://github.com/srhnyldz/flask-monitoring.git', branch: 'main'
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
 
-                }
-            }
-        }
         stage('Build Docker Image') {
             steps {
                 echo 'Building the image'
