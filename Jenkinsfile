@@ -1,12 +1,31 @@
 pipeline {
     agent any
 
+    environment{
+        cred = credentials('aws-key') // AWS access key için tanımlı credential
+        dockerhub_cred = credentials('docker-cred') // Docker Hub için tanımlı credential
+        DOCKER_IMAGE = "srhnyldz/flask-monitoring"
+        DOCKER_TAG = "$BUILD_NUMBER"
+        SONARQUBE_URL = 'http://localhost:9000/'
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
+    }
+
     stages {
         stage('Git Cloning') {
             steps {
                 echo 'Cloning git repo'
                 git url: 'https://github.com/srhnyldz/flask-monitoring.git', branch: 'main'
             }
+        }
+        stage('SonarQube Analysis') {
+           steps {
+                sh """
+                    -Dsonar.projectKey=flask-monitoring \
+                    -Dsonar.host.url=${SONARQUBE_URL} \
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.java.binaries=target/classes
+                """
+            }    
         }
         stage('Build Docker Image') {
             steps {
@@ -24,6 +43,16 @@ pipeline {
                     docker push ${USER}/flask-monitoring:latest
                     '''
                 }
+            }
+        }
+        stage("Update Kubernetes Manifest"){ // Kubernetes manifest dosyasını güncelleme
+            steps{
+                sh "sed -i 's|srhnyldz/flask-monitoring:latest|${DOCKER_IMAGE}:${DOCKER_TAG}|' ./deployment.yaml"
+            }
+        }
+        stage("TRIVY"){
+            steps{
+                 sh "trivy image --scanners vuln ${DOCKER_IMAGE}:${DOCKER_TAG}"
             }
         }
         stage('Integrate Kubernetes with Jenkins') {
