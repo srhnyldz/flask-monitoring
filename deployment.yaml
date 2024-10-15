@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: flask-monitoring
-        image: hbayraktar/flask-monitoring:latest
+        image: srhnyldz/flask-monitoring:latest
         ports:
         - containerPort: 5000
