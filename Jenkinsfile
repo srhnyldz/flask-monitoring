@@ -10,12 +10,6 @@ pipeline {
     }
 
     stages {
-        stage('Git Cloning') {
-            steps {
-                echo 'Cloning git repo'
-                git url: 'https://github.com/srhnyldz/flask-monitoring.git', branch: 'main'
-            }
-        }
        stage("Docker Build & Push"){ // Docker image build ve push aşaması
             steps{
                 script{
