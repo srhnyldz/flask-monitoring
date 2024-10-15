@@ -20,7 +20,7 @@ pipeline {
         stage('SonarQube Analysis') {
            steps {
                 sh """
-                    mvn sonar:sonar \
+                    flask sonar:sonar \
                     -Dsonar.projectKey=flask-monitoring \
                     -Dsonar.host.url=${SONARQUBE_URL} \
                     -Dsonar.login=${SONAR_TOKEN} \
