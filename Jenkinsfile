@@ -5,7 +5,7 @@ pipeline {
         cred = credentials('aws-key') // AWS access key için tanımlı credential
         dockerhub_cred = credentials('docker-cred') // Docker Hub için tanımlı credential
         DOCKER_IMAGE = "srhnyldz/flask-monitoring"
-        DOCKER_TAG = "$BUILD_NUMBER"
+        DOCKER_TAG = "flask-monitoring:latest"
         SONARQUBE_URL = 'http://localhost:9000/'
         SONAR_TOKEN = credentials('SONAR_TOKEN')
     }
