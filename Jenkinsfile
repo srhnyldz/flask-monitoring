@@ -18,22 +18,15 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            environment {
-                SCANNER_HOME = tool 'SonarQube Scanner'
-            }
-            steps {
-                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-                    sh '''
-                    ${SCANNER_HOME}/bin/sonar-scanner \
+           steps {
+                sh """
+                    mvn sonar:sonar \
                     -Dsonar.projectKey=flask-monitoring \
                     -Dsonar.host.url=${SONARQUBE_URL} \
-                    -Dsonar.login=$SONAR_TOKEN \
-                    -Dsonar.python.version=3.8 \
-                    -Dsonar.sources=. \
-                    -Dsonar.language=py
-                    '''
-                }
-            }
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.java.binaries=target/classes
+                """
+            }    
         }
         stage('Build Docker Image') {
             steps {
