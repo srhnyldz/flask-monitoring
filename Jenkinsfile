@@ -18,14 +18,20 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-           steps {
-                sh """
-                    -Dsonar.projectKey=flask-monitoring \
-                    -Dsonar.host.url=${SONARQUBE_URL} \
-                    -Dsonar.login=${SONAR_TOKEN} \
-                    -Dsonar.java.binaries=target/classes
-                """
-            }    
+            steps {
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                    sh """
+                        # SonarQube taraması için sonar-scanner komutunu çalıştır
+                        sonar-scanner \
+                        -Dsonar.projectKey=flask-monitoring \
+                        -Dsonar.host.url=${SONARQUBE_URL} \
+                        -Dsonar.login=${SONAR_TOKEN} \
+                        -Dsonar.python.version=3.8 \
+                        -Dsonar.sources=. \
+                        -Dsonar.language=py
+                    """
+                }
+            }
         }
         stage('Build Docker Image') {
             steps {
