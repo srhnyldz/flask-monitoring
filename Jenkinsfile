@@ -5,7 +5,7 @@ pipeline {
         stage('Git Cloning') {
             steps {
                 echo 'Cloning git repo'
-                git url: 'https://github.com/hakanbayraktar/flask-monitoring.git',  branch: 'main'
+                git url: 'https://github.com/srhnyldz/flask-monitoring.git',  branch: 'main'
             }
         }
         stage('Build Docker Image') {
@@ -17,7 +17,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 echo 'Pushing to Docker Hub'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh '''
                     echo "${PASS}" | docker login --username "${USER}" --password-stdin
                     docker tag flask-monitoring ${USER}/flask-monitoring:latest
