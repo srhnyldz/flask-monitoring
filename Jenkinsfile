@@ -18,16 +18,11 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-           steps {
-                sh """
-                    flask sonar:sonar \
-                    -Dsonar.projectKey=flask-monitoring \
-                    -Dsonar.host.url=${SONARQUBE_URL} \
-                    -Dsonar.login=${SONAR_TOKEN} \
-                    -Dsonar.java.binaries=target/classes
-                """
-            }    
-        }
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv() {
+              sh "${scannerHome}/bin/sonar-scanner"
+            }
+          }
         stage('Build Docker Image') {
             steps {
                 echo 'Building the image'
